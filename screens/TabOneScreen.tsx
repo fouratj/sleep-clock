@@ -1,15 +1,45 @@
 import * as React from 'react';
 import { StyleSheet } from 'react-native';
+import { Audio } from 'expo-av';
 
 import EditScreenInfo from '../components/EditScreenInfo';
 import { Text, View } from '../components/Themed';
+import Button from '../components/Button';
 
 export default function TabOneScreen() {
+  const [sound, setSound] = React.useState<any>(undefined);
+
+  async function playSound() {
+    console.log('Loading Sound');
+    const { sound } = await Audio.Sound.createAsync(
+      require('../assets/audio/alarm.wav'),
+    );
+    setSound(sound);
+
+    console.log('Playing Sound');
+    await sound.playAsync();
+  }
+
+  function stopSound() {
+    setSound(undefined);
+  }
+
+  React.useEffect(() => {
+    return sound
+      ? () => {
+          console.log('Unloading Sound');
+          sound.unloadAsync();
+        }
+      : undefined;
+  }, [sound]);
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="/screens/TabOneScreen.tsx" />
+      {sound ? (
+        <Button btnText="Stop" onClick={stopSound} />
+      ) : (
+        <Button btnText="Sleep" onClick={playSound} />
+      )}
     </View>
   );
 }
