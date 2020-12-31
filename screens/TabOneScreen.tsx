@@ -10,13 +10,11 @@ export default function TabOneScreen() {
   const [sound, setSound] = React.useState<any>(undefined);
 
   async function playSound() {
-    console.log('Loading Sound');
     const { sound } = await Audio.Sound.createAsync(
       require('../assets/audio/alarm.wav'),
     );
     setSound(sound);
 
-    console.log('Playing Sound');
     await sound.playAsync();
   }
 
@@ -24,14 +22,7 @@ export default function TabOneScreen() {
     setSound(undefined);
   }
 
-  React.useEffect(() => {
-    return sound
-      ? () => {
-          console.log('Unloading Sound');
-          sound.unloadAsync();
-        }
-      : undefined;
-  }, [sound]);
+  React.useEffect(() => () => sound?.unloadAsync(), [sound]);
 
   return (
     <View style={styles.container}>
