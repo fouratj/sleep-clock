@@ -8,6 +8,9 @@ import Button from '../components/Button';
 
 export default function TabOneScreen() {
   const [sound, setSound] = React.useState<any>(undefined);
+  const [timer, setTimer] = React.useState(5000);
+  const [timerInterval, setTimerInterval] = React.useState<any>(undefined);
+  const [cancel, setCancel] = React.useState(false);
 
   async function playSound() {
     const { sound } = await Audio.Sound.createAsync(
@@ -18,9 +21,21 @@ export default function TabOneScreen() {
     await sound.playAsync();
   }
 
+  function setAlarm() {
+    const timerInterval = setTimeout(() => playSound(), timer);
+
+    setTimerInterval(timerInterval);
+  }
+
   function stopSound() {
     setSound(undefined);
   }
+
+  React.useEffect(() => {
+    if (cancel) {
+      setTimerInterval(undefined);
+    }
+  }, [cancel]);
 
   React.useEffect(() => () => sound?.unloadAsync(), [sound]);
 
@@ -29,7 +44,7 @@ export default function TabOneScreen() {
       {sound ? (
         <Button btnText="Stop" onClick={stopSound} />
       ) : (
-        <Button btnText="Sleep" onClick={playSound} />
+        <Button btnText="Sleep" onClick={setAlarm} />
       )}
     </View>
   );
