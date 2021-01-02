@@ -76,7 +76,7 @@ enum Current {
 
 export default function TabOneScreen() {
   const [current, setCurrent] = React.useState<Current>(Current.waiting);
-  let timer = React.useRef();
+  let timer = React.useRef<number>();
   const soundRef = React.useRef<any>();
 
   React.useEffect(() => {
