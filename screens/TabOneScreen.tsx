@@ -119,7 +119,6 @@ export default observer(function TabOneScreen() {
   React.useEffect(() => {
     const sub = countdown$.subscribe(() => {
       const timeLeft = endTime ? endTime.fromNow() : '';
-      console.log({ timeLeft });
       setLeft(timeLeft);
     });
 
