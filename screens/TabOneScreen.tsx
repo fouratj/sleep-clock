@@ -38,7 +38,7 @@ export default observer(function TabOneScreen() {
 
   React.useEffect(() => {
     Audio.Sound.createAsync(require('../assets/audio/alarm.wav')).then(
-      ({ sound, status }) => {
+      ({ sound }) => {
         soundRef.current = sound;
       },
     );
