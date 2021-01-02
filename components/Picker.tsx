@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
-import { View, Picker as RNPicker, StyleSheet } from 'react-native';
+import { Picker as RNPicker, StyleSheet } from 'react-native';
+
+import { Text, View } from './Themed';
+
+import { Picker as RNPicker1 } from '@react-native-picker/picker';
 
 const ONE_HOUR = 1000 * 60 * 60;
 
@@ -25,19 +29,20 @@ const Picker = (props: Props) => {
 
   return (
     <View style={styles.container}>
-      <RNPicker
+      <Text>Choose duration of sleep</Text>
+      <RNPicker1
         selectedValue={selectedValue}
-        style={{ height: 50, width: 150 }}
+        style={{ height: 50, width: 150, color: 'white' }}
         onValueChange={(itemValue, itemIndex) => handleChange(itemValue)}
       >
         {options.map((option) => (
-          <RNPicker.Item
+          <RNPicker1.Item
             key={option.label}
             label={option.label}
             value={option.value}
           />
         ))}
-      </RNPicker>
+      </RNPicker1>
     </View>
   );
 };
