@@ -13,8 +13,8 @@ const list = [
     name: 'Sleep Time',
     avatar_url:
       'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-    subtitle: (currValue) =>
-      `Time you would like to sleep for. Currently ${currValue}`,
+    subtitle: (currValue: number) =>
+      `Time you would like to sleep for. Currently set to ${currValue} hours.`,
     onPress: (toggle: () => void) => toggle(),
   },
 ];
@@ -37,7 +37,9 @@ export default observer(function TabTwoScreen() {
         <ListItem key={l.name} bottomDivider onPress={toggleOverlay}>
           <ListItem.Content>
             <ListItem.Title>{l.name}</ListItem.Title>
-            <ListItem.Subtitle>{l.subtitle(Alarm.duration)}</ListItem.Subtitle>
+            <ListItem.Subtitle>
+              {l.subtitle(Alarm.duration / 60 / 60 / 1000)}
+            </ListItem.Subtitle>
           </ListItem.Content>
         </ListItem>
       ))}
