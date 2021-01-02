@@ -39,18 +39,11 @@ export default observer(function TabOneScreen() {
   const endTime = Alarm.endTime;
 
   React.useEffect(() => {
-    Audio.Sound.createAsync(require('../assets/audio/alarm.wav'), {
-      progressUpdateIntervalMillis: 500,
-      positionMillis: 0,
-      shouldPlay: false,
-      rate: 1.0,
-      shouldCorrectPitch: false,
-      volume: 1.0,
-      isMuted: false,
-      isLooping: false,
-    }).then(({ sound, status }) => {
-      soundRef.current = sound;
-    });
+    Audio.Sound.createAsync(require('../assets/audio/alarm.wav')).then(
+      ({ sound, status }) => {
+        soundRef.current = sound;
+      },
+    );
 
     return () => {
       soundRef.current?.unloadAsync();
@@ -78,12 +71,14 @@ export default observer(function TabOneScreen() {
 
   const stopAlarm = React.useCallback(() => {
     Alarm.setEndTime(null);
+    setLeft('');
     window.clearTimeout(timer.current);
     dismissAlarm();
   }, []);
 
   const dismissAlarm = React.useCallback(() => {
     Alarm.setEndTime(null);
+    setLeft('');
     stopSound();
   }, []);
 
@@ -98,7 +93,7 @@ export default observer(function TabOneScreen() {
         return (
           <Button
             btnText="Sleep"
-            onClick={() => setAlarm()}
+            onClick={setAlarm}
             icon={<MaterialCommunityIcons name="sleep" size={30} />}
           />
         );
@@ -106,7 +101,7 @@ export default observer(function TabOneScreen() {
         return (
           <Button
             btnText="Stop"
-            onClick={() => stopAlarm()}
+            onClick={stopAlarm}
             icon={
               <MaterialCommunityIcons name="stop-circle-outline" size={30} />
             }
@@ -116,7 +111,7 @@ export default observer(function TabOneScreen() {
         return (
           <Button
             btnText="Dismiss"
-            onClick={() => dismissAlarm()}
+            onClick={dismissAlarm}
             icon={<MaterialCommunityIcons name="close" size={30} />}
           />
         );
@@ -126,7 +121,7 @@ export default observer(function TabOneScreen() {
   React.useEffect(() => {
     const sub = countdown$.subscribe(() => {
       const timeLeft = endTime ? endTime.fromNow() : '';
-
+      console.log({ timeLeft });
       setLeft(timeLeft);
     });
 
@@ -135,9 +130,15 @@ export default observer(function TabOneScreen() {
 
   return (
     <View style={styles.container}>
-      {left ? <Text>Wake {left}</Text> : null}
+      {left ? (
+        <View style={styles.container}>
+          <Text style={styles.title}>Shh, waking {left}</Text>
+        </View>
+      ) : null}
 
-      {button}
+      <View style={styles.separator}></View>
+
+      <View style={styles.container}>{button}</View>
     </View>
   );
 });
