@@ -16,11 +16,14 @@ const options = [
 ];
 
 type Props = {
+  defaultValue?: string;
   onSelected: (op: number) => void;
 };
 
 const Picker = (props: Props) => {
-  const [selectedValue, setSelectedValue] = useState('java');
+  const [selectedValue, setSelectedValue] = useState(
+    props.defaultValue || options[0].label, // todo fix default value
+  );
 
   const handleChange = (a) => {
     setSelectedValue(a);
@@ -32,7 +35,7 @@ const Picker = (props: Props) => {
       <Text>Choose duration of sleep</Text>
       <RNPicker1
         selectedValue={selectedValue}
-        style={{ height: 50, width: 150, color: 'white' }}
+        style={styles.pickItem}
         onValueChange={(itemValue) => handleChange(itemValue)}
       >
         {options.map((option) => (
@@ -52,6 +55,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  pickItem: {
+    height: 50,
+    width: 150,
+    color: 'white',
   },
 });
 

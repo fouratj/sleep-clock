@@ -3,10 +3,10 @@ import { StyleSheet } from 'react-native';
 import { ListItem, Avatar, Overlay } from 'react-native-elements';
 import { observer } from 'mobx-react';
 
-import EditScreenInfo from '../components/EditScreenInfo';
-import { Text, View } from '../components/Themed';
-import Picker from '../components/Picker';
-import Alarm from '../state/alarm';
+import EditScreenInfo from '../../components/EditScreenInfo';
+import { Text, View } from '../../components/Themed';
+import Picker from '../../components/Picker';
+import Alarm from '../../state/alarm';
 
 const list = [
   {
@@ -19,7 +19,7 @@ const list = [
   },
 ];
 
-export default observer(function TabTwoScreen() {
+export default observer(() => {
   const [visible, setVisible] = React.useState(false);
 
   const toggleOverlay = () => {

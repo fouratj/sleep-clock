@@ -3,25 +3,15 @@ import { StyleSheet } from 'react-native';
 import { Audio } from 'expo-av';
 import dayjs from 'dayjs';
 import { observer } from 'mobx-react';
+import { interval } from 'rxjs';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { Text, View } from '../components/Themed';
 import Button from '../components/Button';
-import { of, interval, concat, Subject, Subscription } from 'rxjs';
-import {
-  takeWhile,
-  takeUntil,
-  scan,
-  startWith,
-  share,
-  filter,
-  tap,
-  repeatWhen,
-  finalize,
-} from 'rxjs/operators';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+
 import Alarm from '../state/alarm';
 
-const countdown$ = interval(60000); // 1 min
+const countdown$ = interval(1000); // 1 min
 
 enum Current {
   waiting = 'waiting',
@@ -29,9 +19,9 @@ enum Current {
   ringing = 'ringing',
 }
 
-export default observer(function TabOneScreen() {
+export default observer(() => {
   const [current, setCurrent] = React.useState<Current>(Current.waiting);
-  const [left, setLeft] = React.useState<string>('');
+  const [left, setLeft] = React.useState<string | undefined>('');
   const timer = React.useRef<number>();
   const soundRef = React.useRef<any>();
   const endTime = Alarm.endTime;
@@ -69,14 +59,14 @@ export default observer(function TabOneScreen() {
 
   const stopAlarm = React.useCallback(() => {
     Alarm.setEndTime(null);
-    setLeft('');
+    setLeft(undefined);
     window.clearTimeout(timer.current);
     dismissAlarm();
   }, []);
 
   const dismissAlarm = React.useCallback(() => {
     Alarm.setEndTime(null);
-    setLeft('');
+    setLeft(undefined);
     stopSound();
   }, []);
 
@@ -119,6 +109,7 @@ export default observer(function TabOneScreen() {
   React.useEffect(() => {
     const sub = countdown$.subscribe(() => {
       const timeLeft = endTime ? endTime.fromNow() : '';
+      console.log({ timeLeft });
       setLeft(timeLeft);
     });
 
