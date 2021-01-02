@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { StyleSheet } from 'react-native';
 import { ListItem, Avatar, Overlay } from 'react-native-elements';
+import { observer } from 'mobx-react';
 
 import EditScreenInfo from '../components/EditScreenInfo';
 import { Text, View } from '../components/Themed';
@@ -12,12 +13,13 @@ const list = [
     name: 'Sleep Time',
     avatar_url:
       'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-    subtitle: 'Time you would like to sleep for',
+    subtitle: (currValue) =>
+      `Time you would like to sleep for. Currently ${currValue}`,
     onPress: (toggle: () => void) => toggle(),
   },
 ];
 
-export default function TabTwoScreen() {
+export default observer(function TabTwoScreen() {
   const [visible, setVisible] = React.useState(false);
 
   const toggleOverlay = () => {
@@ -35,7 +37,7 @@ export default function TabTwoScreen() {
         <ListItem key={l.name} bottomDivider onPress={toggleOverlay}>
           <ListItem.Content>
             <ListItem.Title>{l.name}</ListItem.Title>
-            <ListItem.Subtitle>{l.subtitle}</ListItem.Subtitle>
+            <ListItem.Subtitle>{l.subtitle(Alarm.duration)}</ListItem.Subtitle>
           </ListItem.Content>
         </ListItem>
       ))}
@@ -47,7 +49,7 @@ export default function TabTwoScreen() {
       </Overlay>
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {
