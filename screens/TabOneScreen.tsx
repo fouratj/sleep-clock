@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { StyleSheet } from 'react-native';
 import { Audio } from 'expo-av';
-// import { observer } from 'mobx-react';
 import dayjs from 'dayjs';
+import { observer } from 'mobx-react';
 
 import { Text, View } from '../components/Themed';
 import Button from '../components/Button';
@@ -18,55 +18,12 @@ import {
   repeatWhen,
   finalize,
 } from 'rxjs/operators';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Alarm from '../state/alarm';
 
-// let soundObj;
-// async function playSound() {
-//   if (soundObj) {
-//     await soundObj.playAsync();
-//   }
+const DEFAULT_TIME = 1000 * 60 * 2; // * 60 * 7.5; // 8 hours
 
-//   Audio.Sound.createAsync(require('../assets/audio/alarm.wav')).then(
-//     ({ sound }) => {
-//       console.log(sound);
-//       soundObj = sound;
-
-//       soundObj.playAsync();
-//     },
-//   );
-// }
-
-// const DEFAULT_TIME = 5; //1000 * 60 * 60 * 8; // 8 hours
-
-// const countdown$ = interval(1000)
-//   .pipe(
-//     startWith(DEFAULT_TIME),
-//     scan((time) => time - 1),
-//     takeWhile((time) => time > 0),
-//     finalize(() => {
-//       playSound();
-//     }),
-//   )
-//   .pipe(share());
-
-// const actions$ = new Subject();
-
-// const snooze$ = actions$.pipe(
-//   filter((action) => action === 'snooze'),
-//   tap(() => {
-//     // soundObj = undefined;
-//     soundObj?.unloadAsync();
-//   }),
-// );
-// const dismiss$ = actions$.pipe(filter((action) => action === 'dismiss'));
-
-// const alarm$ = concat(countdown$, of('Wake up! 🎉')).pipe(
-//   repeatWhen(() => snooze$),
-// );
-
-// const observable$ = concat(
-//   alarm$.pipe(takeUntil(dismiss$)),
-//   of('Have a nice day! 🤗'),
-// );
+const countdown$ = interval(60000); // 1 min
 
 enum Current {
   waiting = 'waiting',
@@ -74,10 +31,12 @@ enum Current {
   ringing = 'ringing',
 }
 
-export default function TabOneScreen() {
+export default observer(function TabOneScreen() {
   const [current, setCurrent] = React.useState<Current>(Current.waiting);
-  let timer = React.useRef<number>();
+  const [left, setLeft] = React.useState<string>('');
+  const timer = React.useRef<number>();
   const soundRef = React.useRef<any>();
+  const endTime = Alarm.endTime;
 
   React.useEffect(() => {
     Audio.Sound.createAsync(require('../assets/audio/alarm.wav'), {
@@ -99,27 +58,34 @@ export default function TabOneScreen() {
     };
   }, []);
 
-  function setAlarm() {
+  const setAlarm = React.useCallback(() => {
+    const endTime = dayjs().add(Alarm.duration, 'ms');
+    Alarm.setEndTime(endTime);
+
+    setLeft(endTime.fromNow());
+
     setCurrent(Current.ticking);
+
     if (timer.current) {
       window.clearTimeout(timer.current);
     }
 
     timer.current = window.setTimeout(() => {
       setCurrent(Current.ringing);
-      console.log('playing sound');
       soundRef.current.playAsync();
-    }, 3000);
-  }
+    }, Alarm.duration);
+  }, []);
 
-  function stopAlarm() {
+  const stopAlarm = React.useCallback(() => {
+    Alarm.setEndTime(null);
     window.clearTimeout(timer.current);
     dismissAlarm();
-  }
+  }, []);
 
-  function dismissAlarm() {
+  const dismissAlarm = React.useCallback(() => {
+    Alarm.setEndTime(null);
     stopSound();
-  }
+  }, []);
 
   async function stopSound() {
     await soundRef.current.stopAsync();
@@ -129,16 +95,52 @@ export default function TabOneScreen() {
   const button = React.useMemo(() => {
     switch (current) {
       case Current.waiting:
-        return <Button btnText="Sleep" onClick={() => setAlarm()} />;
+        return (
+          <Button
+            btnText="Sleep"
+            onClick={() => setAlarm()}
+            icon={<MaterialCommunityIcons name="sleep" size={30} />}
+          />
+        );
       case Current.ticking:
-        return <Button btnText="Stop" onClick={() => stopAlarm()} />;
+        return (
+          <Button
+            btnText="Stop"
+            onClick={() => stopAlarm()}
+            icon={
+              <MaterialCommunityIcons name="stop-circle-outline" size={30} />
+            }
+          />
+        );
       case Current.ringing:
-        return <Button btnText="Dismiss" onClick={() => dismissAlarm()} />;
+        return (
+          <Button
+            btnText="Dismiss"
+            onClick={() => dismissAlarm()}
+            icon={<MaterialCommunityIcons name="close" size={30} />}
+          />
+        );
     }
   }, [current]);
 
-  return <View style={styles.container}>{button}</View>;
-}
+  React.useEffect(() => {
+    const sub = countdown$.subscribe(() => {
+      const timeLeft = endTime ? endTime.fromNow() : '';
+
+      setLeft(timeLeft);
+    });
+
+    return () => sub.unsubscribe();
+  }, []);
+
+  return (
+    <View style={styles.container}>
+      {left ? <Text>Wake {left}</Text> : null}
+
+      {button}
+    </View>
+  );
+});
 
 const styles = StyleSheet.create({
   container: {
