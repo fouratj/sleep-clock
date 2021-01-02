@@ -21,8 +21,6 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Alarm from '../state/alarm';
 
-const DEFAULT_TIME = 1000 * 60 * 2; // * 60 * 7.5; // 8 hours
-
 const countdown$ = interval(60000); // 1 min
 
 enum Current {
