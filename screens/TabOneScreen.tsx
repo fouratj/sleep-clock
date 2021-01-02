@@ -1,53 +1,143 @@
 import * as React from 'react';
 import { StyleSheet } from 'react-native';
 import { Audio } from 'expo-av';
+// import { observer } from 'mobx-react';
+import dayjs from 'dayjs';
 
-import EditScreenInfo from '../components/EditScreenInfo';
 import { Text, View } from '../components/Themed';
 import Button from '../components/Button';
+import { of, interval, concat, Subject, Subscription } from 'rxjs';
+import {
+  takeWhile,
+  takeUntil,
+  scan,
+  startWith,
+  share,
+  filter,
+  tap,
+  repeatWhen,
+  finalize,
+} from 'rxjs/operators';
+
+// let soundObj;
+// async function playSound() {
+//   if (soundObj) {
+//     await soundObj.playAsync();
+//   }
+
+//   Audio.Sound.createAsync(require('../assets/audio/alarm.wav')).then(
+//     ({ sound }) => {
+//       console.log(sound);
+//       soundObj = sound;
+
+//       soundObj.playAsync();
+//     },
+//   );
+// }
+
+// const DEFAULT_TIME = 5; //1000 * 60 * 60 * 8; // 8 hours
+
+// const countdown$ = interval(1000)
+//   .pipe(
+//     startWith(DEFAULT_TIME),
+//     scan((time) => time - 1),
+//     takeWhile((time) => time > 0),
+//     finalize(() => {
+//       playSound();
+//     }),
+//   )
+//   .pipe(share());
+
+// const actions$ = new Subject();
+
+// const snooze$ = actions$.pipe(
+//   filter((action) => action === 'snooze'),
+//   tap(() => {
+//     // soundObj = undefined;
+//     soundObj?.unloadAsync();
+//   }),
+// );
+// const dismiss$ = actions$.pipe(filter((action) => action === 'dismiss'));
+
+// const alarm$ = concat(countdown$, of('Wake up! 🎉')).pipe(
+//   repeatWhen(() => snooze$),
+// );
+
+// const observable$ = concat(
+//   alarm$.pipe(takeUntil(dismiss$)),
+//   of('Have a nice day! 🤗'),
+// );
+
+enum Current {
+  waiting = 'waiting',
+  ticking = 'ticking',
+  ringing = 'ringing',
+}
 
 export default function TabOneScreen() {
-  const [sound, setSound] = React.useState<any>(undefined);
-  const [timer, setTimer] = React.useState(5000);
-  const [timerInterval, setTimerInterval] = React.useState<any>(undefined);
-  const [cancel, setCancel] = React.useState(false);
-
-  async function playSound() {
-    const { sound } = await Audio.Sound.createAsync(
-      require('../assets/audio/alarm.wav'),
-    );
-    setSound(sound);
-
-    await sound.playAsync();
-  }
-
-  function setAlarm() {
-    const timerInterval = setTimeout(() => playSound(), timer);
-
-    setTimerInterval(timerInterval);
-  }
-
-  function stopSound() {
-    setSound(undefined);
-  }
+  const [current, setCurrent] = React.useState<Current>(Current.waiting);
+  let timer = React.useRef();
+  const soundRef = React.useRef<any>();
 
   React.useEffect(() => {
-    if (cancel) {
-      setTimerInterval(undefined);
+    Audio.Sound.createAsync(require('../assets/audio/alarm.wav'), {
+      progressUpdateIntervalMillis: 500,
+      positionMillis: 0,
+      shouldPlay: false,
+      rate: 1.0,
+      shouldCorrectPitch: false,
+      volume: 1.0,
+      isMuted: false,
+      isLooping: false,
+    }).then(({ sound, status }) => {
+      soundRef.current = sound;
+    });
+
+    return () => {
+      soundRef.current?.unloadAsync();
+      window.clearTimeout(timer.current);
+    };
+  }, []);
+
+  function setAlarm() {
+    setCurrent(Current.ticking);
+    if (timer.current) {
+      window.clearTimeout(timer.current);
     }
-  }, [cancel]);
 
-  React.useEffect(() => () => sound?.unloadAsync(), [sound]);
+    timer.current = window.setTimeout(() => {
+      setCurrent(Current.ringing);
+      console.log('playing sound');
+      soundRef.current.playAsync();
+    }, 3000);
+  }
 
-  return (
-    <View style={styles.container}>
-      {sound ? (
-        <Button btnText="Stop" onClick={stopSound} />
-      ) : (
-        <Button btnText="Sleep" onClick={setAlarm} />
-      )}
-    </View>
-  );
+  function stopAlarm() {
+    window.clearTimeout(timer.current);
+    dismissAlarm();
+  }
+
+  function dismissAlarm() {
+    stopSound();
+  }
+
+  async function stopSound() {
+    await soundRef.current.stopAsync();
+    setCurrent(Current.waiting);
+  }
+
+  const button = React.useMemo(() => {
+    switch (current) {
+      case Current.waiting:
+        return <Button btnText="Sleep" onClick={() => setAlarm()} />;
+      case Current.ticking:
+        return <Button btnText="Stop" onClick={() => stopAlarm()} />;
+      case Current.ringing:
+        return <Button btnText="Dismiss" onClick={() => dismissAlarm()} />;
+    }
+  }, [current]);
+
+  return <View style={styles.container}>{button}</View>;
 }
 
 const styles = StyleSheet.create({
