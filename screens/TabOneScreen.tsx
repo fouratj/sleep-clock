@@ -128,7 +128,7 @@ export default observer(function TabOneScreen() {
 
   return (
     <View style={styles.container}>
-      {left ? (
+      {endTime && left ? (
         <View style={styles.container}>
           <Text style={styles.title}>Shh, waking {left}</Text>
         </View>
