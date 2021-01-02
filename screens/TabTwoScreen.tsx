@@ -26,13 +26,13 @@ export default function TabTwoScreen() {
 
   const onChange = (a) => {
     Alarm.setDuration(a);
+    toggleOverlay();
   };
 
   return (
     <View>
-      {list.map((l, i) => (
+      {list.map((l) => (
         <ListItem key={l.name} bottomDivider onPress={toggleOverlay}>
-          <Avatar source={{ uri: l.avatar_url }} />
           <ListItem.Content>
             <ListItem.Title>{l.name}</ListItem.Title>
             <ListItem.Subtitle>{l.subtitle}</ListItem.Subtitle>
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     // flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'white',
+    // backgroundColor: 'white',
     width: 250,
     height: 250,
   },
