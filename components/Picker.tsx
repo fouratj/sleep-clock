@@ -33,7 +33,7 @@ const Picker = (props: Props) => {
       <RNPicker1
         selectedValue={selectedValue}
         style={{ height: 50, width: 150, color: 'white' }}
-        onValueChange={(itemValue, itemIndex) => handleChange(itemValue)}
+        onValueChange={(itemValue) => handleChange(itemValue)}
       >
         {options.map((option) => (
           <RNPicker1.Item
