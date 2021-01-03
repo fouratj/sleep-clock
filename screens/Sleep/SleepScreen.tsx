@@ -6,10 +6,9 @@ import { observer } from 'mobx-react';
 import { interval } from 'rxjs';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { Text, View } from '../components/Themed';
-import Button from '../components/Button';
-
-import Alarm from '../state/alarm';
+import { Text, View } from '../../components/Themed';
+import Button from '../../components/Button';
+import Alarm from '../../state/alarm';
 
 const countdown$ = interval(1000); // 1 min
 
