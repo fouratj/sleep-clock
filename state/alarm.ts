@@ -3,10 +3,16 @@ import { Dayjs } from 'dayjs';
 
 const DEFAULT_TIME = 1000 * 60 * 60 * 7.5; // 7.5 hours
 
+export enum AlarmStatus {
+  waiting = 'waiting',
+  ticking = 'ticking',
+  ringing = 'ringing',
+}
+
 class Alarm {
-  endTime: Dayjs | null = null;
   duration: number = DEFAULT_TIME;
-  isTickingDown: boolean = false;
+  endTime: Dayjs | null = null;
+  status: AlarmStatus = AlarmStatus.waiting;
 
   constructor() {
     makeObservable(this, {
@@ -14,7 +20,8 @@ class Alarm {
       endTime: observable,
       setEndTime: action,
       setDuration: action,
-      isTickingDown: observable,
+      status: observable,
+      setStatus: action,
     });
   }
 
@@ -24,6 +31,10 @@ class Alarm {
 
   setDuration(duration: number) {
     this.duration = duration;
+  }
+
+  setStatus(status: AlarmStatus) {
+    this.status = status;
   }
 }
 
