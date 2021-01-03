@@ -8,7 +8,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { Text, View } from '../../components/Themed';
 import Button from '../../components/Button';
-import Alarm from '../../state/alarm';
+import Alarm, { AlarmStatus } from '../../state/alarm';
 
 const countdown$ = interval(1000); // 1 min
 
@@ -19,7 +19,6 @@ enum Current {
 }
 
 export default observer(() => {
-  const [current, setCurrent] = React.useState<Current>(Current.waiting);
   const [left, setLeft] = React.useState<string | undefined>('');
   const timer = React.useRef<number>();
   const soundRef = React.useRef<Audio.Sound>();
@@ -43,16 +42,15 @@ export default observer(() => {
     Alarm.setEndTime(endTime);
 
     setLeft(endTime.fromNow());
-
-    setCurrent(Current.ticking);
+    Alarm.setStatus(AlarmStatus.ticking);
 
     if (timer.current) {
       window.clearTimeout(timer.current);
     }
 
     timer.current = window.setTimeout(() => {
-      setCurrent(Current.ringing);
-      soundRef.current.playAsync();
+      Alarm.setStatus(AlarmStatus.ringing);
+      soundRef.current?.playAsync();
     }, Alarm.duration);
   }, []);
 
@@ -70,13 +68,13 @@ export default observer(() => {
   }, []);
 
   async function stopSound() {
-    await soundRef.current.stopAsync();
-    setCurrent(Current.waiting);
+    await soundRef.current?.stopAsync();
+    Alarm.setStatus(AlarmStatus.waiting);
   }
 
   const button = React.useMemo(() => {
-    switch (current) {
-      case Current.waiting:
+    switch (Alarm.status) {
+      case AlarmStatus.waiting:
         return (
           <Button
             btnText="Sleep"
@@ -84,7 +82,7 @@ export default observer(() => {
             icon={<MaterialCommunityIcons name="sleep" size={30} />}
           />
         );
-      case Current.ticking:
+      case AlarmStatus.ticking:
         return (
           <Button
             btnText="Stop"
@@ -94,7 +92,7 @@ export default observer(() => {
             }
           />
         );
-      case Current.ringing:
+      case AlarmStatus.ringing:
         return (
           <Button
             btnText="Dismiss"
@@ -103,7 +101,7 @@ export default observer(() => {
           />
         );
     }
-  }, [current]);
+  }, [Alarm.status]);
 
   React.useEffect(() => {
     const sub = countdown$.subscribe(() => {
