@@ -22,7 +22,7 @@ export default observer(() => {
   const [current, setCurrent] = React.useState<Current>(Current.waiting);
   const [left, setLeft] = React.useState<string | undefined>('');
   const timer = React.useRef<number>();
-  const soundRef = React.useRef<any>();
+  const soundRef = React.useRef<Audio.Sound>();
   const endTime = Alarm.endTime;
 
   React.useEffect(() => {
