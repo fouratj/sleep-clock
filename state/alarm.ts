@@ -6,6 +6,7 @@ const DEFAULT_TIME = 1000 * 60 * 60 * 7.5; // 7.5 hours
 class Alarm {
   endTime: Dayjs | null = null;
   duration: number = DEFAULT_TIME;
+  isTickingDown: boolean = false;
 
   constructor() {
     makeObservable(this, {
@@ -13,6 +14,7 @@ class Alarm {
       endTime: observable,
       setEndTime: action,
       setDuration: action,
+      isTickingDown: observable,
     });
   }
 
