@@ -12,12 +12,6 @@ import Alarm, { AlarmStatus } from '../../state/alarm';
 
 const countdown$ = interval(1000); // 1 min
 
-enum Current {
-  waiting = 'waiting',
-  ticking = 'ticking',
-  ringing = 'ringing',
-}
-
 export default observer(() => {
   const [left, setLeft] = React.useState<string | undefined>('');
   const timer = React.useRef<number>();
