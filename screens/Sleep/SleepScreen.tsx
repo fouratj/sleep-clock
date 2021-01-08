@@ -9,6 +9,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Text, View } from '../../components/Themed';
 import Button from '../../components/Button';
 import Alarm, { AlarmStatus } from '../../state/alarm';
+import Top from './components/Top';
+import Bottom from './components/Bottom';
 
 const countdown$ = interval(1000); // 1 min
 
@@ -19,7 +21,7 @@ export default observer(() => {
   const endTime = Alarm.endTime;
 
   React.useEffect(() => {
-    Audio.Sound.createAsync(require('../assets/audio/alarm.wav')).then(
+    Audio.Sound.createAsync(require('../../assets/audio/alarm.wav')).then(
       ({ sound }) => {
         soundRef.current = sound;
       },
@@ -106,6 +108,13 @@ export default observer(() => {
 
     return () => sub.unsubscribe();
   }, []);
+
+  return (
+    <View style={styles.container}>
+      <Top />
+      <Bottom />
+    </View>
+  );
 
   return (
     <View style={styles.container}>

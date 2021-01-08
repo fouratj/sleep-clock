@@ -5,8 +5,8 @@ import * as React from 'react';
 
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
-import TabOneScreen from '../screens/Settings/SettingsScreen';
-import TabTwoScreen from '../screens/Sleep/SleepScreen';
+import TabOneScreen from '../screens/Sleep/SleepScreen';
+import TabTwoScreen from '../screens/Settings/SettingsScreen';
 import { BottomTabParamList, TabOneParamList, TabTwoParamList } from '../types';
 
 const BottomTab = createBottomTabNavigator<BottomTabParamList>();
