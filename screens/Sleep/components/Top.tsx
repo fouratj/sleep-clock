@@ -4,7 +4,6 @@ import { Audio } from 'expo-av';
 import dayjs from 'dayjs';
 import { observer } from 'mobx-react';
 import { interval } from 'rxjs';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { Text, View } from '../../../components/Themed';
 import Alarm, { AlarmStatus } from '../../../state/alarm';
@@ -12,15 +11,11 @@ import Alarm, { AlarmStatus } from '../../../state/alarm';
 const countdown$ = interval(1000); // 1 min
 
 export default observer(() => {
-  const [left, setLeft] = React.useState<string>('');
+  const [num, setNum] = React.useState(0);
   const endTime = Alarm.endTime;
 
   React.useEffect(() => {
-    const sub = countdown$.subscribe(() => {
-      const timeLeft = endTime ? endTime.fromNow() : '';
-
-      setLeft(timeLeft);
-    });
+    const sub = countdown$.subscribe(setNum);
 
     return () => sub.unsubscribe();
   }, []);
@@ -33,11 +28,30 @@ export default observer(() => {
     );
   }
 
+  let parts;
+
+  if (endTime) {
+    const difference = dayjs().diff(endTime, 'ms');
+
+    parts = {
+      hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+      minutes: Math.floor((difference / 1000 / 60) % 60),
+      seconds: Math.floor((difference / 1000) % 60),
+    };
+
+    console.log({ parts });
+  }
+
   return (
     <View style={styles.container}>
-      {endTime && left ? (
+      {endTime ? (
         <View style={styles.container}>
-          <Text style={styles.title}>Shh, waking {left}</Text>
+          <Text style={styles.title}>Shh, waking {endTime.fromNow()}</Text>
+          {parts ? (
+            <Text style={styles.title}>
+              {parts.hours}:{parts.minutes}:{parts.seconds}
+            </Text>
+          ) : null}
         </View>
       ) : null}
     </View>
