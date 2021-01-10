@@ -3,7 +3,6 @@ import { StyleSheet } from 'react-native';
 import { ListItem, Avatar, Overlay } from 'react-native-elements';
 import { observer } from 'mobx-react';
 
-import EditScreenInfo from '../../components/EditScreenInfo';
 import { Text, View } from '../../components/Themed';
 import Picker from '../../components/Picker';
 import Alarm from '../../state/alarm';
@@ -55,10 +54,8 @@ export default observer(() => {
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    // backgroundColor: 'white',
     width: 250,
     height: 250,
   },
