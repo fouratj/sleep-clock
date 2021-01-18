@@ -7,6 +7,7 @@ import { interval } from 'rxjs';
 
 import { Text, View } from '../../../components/Themed';
 import Alarm, { AlarmStatus } from '../../../state/alarm';
+import { padDigit } from '../../../util/padding'
 
 const countdown$ = interval(1000); // 1 min
 
@@ -31,15 +32,17 @@ export default observer(() => {
   let parts;
 
   if (endTime) {
-    const difference = dayjs().diff(endTime, 'ms');
+    const ms = dayjs().diff(endTime, 'ms');
+
+    const hours = Math.abs(ms / (1000 * 60 * 60) % 60);
+    const minutes = Math.abs(ms / (1000 * 60) % 60);
+    const seconds = Math.abs(ms / 1000 % 60);
 
     parts = {
-      hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-      minutes: Math.floor((difference / 1000 / 60) % 60),
-      seconds: Math.floor((difference / 1000) % 60),
+      hours : Math.floor(hours),
+      minutes : Math.floor(minutes),
+      seconds : Math.floor(seconds),
     };
-
-    console.log({ parts });
   }
 
   return (
@@ -49,7 +52,7 @@ export default observer(() => {
           <Text style={styles.title}>Shh, waking {endTime.fromNow()}</Text>
           {parts ? (
             <Text style={styles.title}>
-              {parts.hours}:{parts.minutes}:{parts.seconds}
+              {padDigit(parts.hours)}:{padDigit(parts.minutes)}:{padDigit(parts.seconds)}
             </Text>
           ) : null}
         </View>
