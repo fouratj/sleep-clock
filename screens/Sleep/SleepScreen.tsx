@@ -27,13 +27,13 @@ export default function SleepScreen() {
     };
   }, []);
 
-  async function stopSound() {
+  const stopSound = React.useCallback(async () => {
     await soundRef.current?.stopAsync();
-  }
+  }, []);
 
-  async function playSound() {
+  const playSound = React.useCallback(async () => {
     await soundRef.current?.playAsync();
-  }
+  }, []);
 
   if (loading) {
     return <RNButton title="" loading />;
